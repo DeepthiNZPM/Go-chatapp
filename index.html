@@ -1,0 +1,50 @@
+<h1>Real-Time Chat</h1>
+
+<!-- Username input -->
+<label for="username">Enter your username:</label>
+<input type="text" id="username" placeholder="Enter your name..." />
+<button onclick="setUsername()">Set Username</button>
+
+<ul id="chat"></ul>
+<input type="text" id="message" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    let username = "";
+
+    // Set username
+    function setUsername() {
+        username = document.getElementById("username").value;
+        if (username.trim()) {
+            document.getElementById("username").disabled = true;
+            document.querySelector("button").disabled = true;  // Disable the Set Username button
+            document.getElementById("message").focus();
+        } else {
+            alert("Please enter a valid username!");
+        }
+    }
+
+    // Send message
+    function sendMessage() {
+        let input = document.getElementById("message");
+        if (username && input.value.trim()) {
+            socket.send(username + ": " + input.value);  // Prefix message with username
+            input.value = "";  // Clear input after sending
+        } else {
+            alert("Please set a username and type a message!");
+        }
+    }
+
+    // WebSocket connection
+    const socket = new WebSocket("ws://localhost:8080/ws");
+
+    socket.onopen = function() {
+        console.log("Connected to WebSocket server.");
+    };
+
+    socket.onmessage = function(event) {
+        let msg = document.createElement("li");
+        msg.textContent = event.data;
+        document.getElementById("chat").appendChild(msg);
+    };
+</script>
